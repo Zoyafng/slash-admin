@@ -1,9 +1,10 @@
 import * as React from "react"
 import { useForm } from "react-hook-form"
-import { Form, FormItem, FormLabel, FormControl } from "@/ui/form"
+import { Form } from "@/ui/form"
 import { Button } from "@/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card"
 import QuestionCreateModal, { Question as QuestionType, QuestionType as QuestionTypeEnum, Option } from "../components/question-create-modal"
+import { RadioGroup, RadioGroupItem } from "@/ui/radio-group"
 
 // 题型分类
 enum QuestionCategory {
@@ -145,12 +146,22 @@ export default function ExamTab() {
                                         <div className="space-y-6">
                                             {
                                                 category.questions.map((question, questionIndex) => (
-                                                    <Card key={question.id} className="border">
-                                                        <CardHeader className="pb-2">
-                                                            <div className="flex justify-between items-center">
-                                                                <CardTitle className="text-lg">
-                                                                    题目 {questionIndex + 1}
-                                                                </CardTitle>
+                                                    <Card key={question.id} className="border gap-4">
+                                                        <CardHeader className="pb-0">
+                                                            <div className="flex justify-between items-start">
+                                                                <div>
+                                                                    <CardTitle className="text-lg">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <div>题目 ID {questionIndex + 1}</div>
+                                                                            <div className="text-sm text-muted-foreground">
+                                                                                {question.type === QuestionTypeEnum.SINGLE_CHOICE && "单选题"}
+                                                                                {question.type === QuestionTypeEnum.MULTIPLE_CHOICE && "多选题"}
+                                                                                {question.type === QuestionTypeEnum.SHORT_ANSWER && "简答题"}
+                                                                                <span className="ml-2">({question.score} 分)</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </CardTitle>
+                                                                </div>
                                                                 <div className="flex space-x-2">
                                                                     <Button
                                                                         type="button"
@@ -172,80 +183,54 @@ export default function ExamTab() {
                                                             </div>
                                                         </CardHeader>
                                                         <CardContent className="space-y-4">
-                                                            {/* 题目类型显示 */}
-                                                            <FormItem>
-                                                                <FormLabel>题目类型</FormLabel>
-                                                                <FormControl>
-                                                                    <div className="px-3 py-2 border rounded-md bg-muted">
-                                                                        {question.type === QuestionTypeEnum.SINGLE_CHOICE && "单选题"}
-                                                                        {question.type === QuestionTypeEnum.MULTIPLE_CHOICE && "多选题"}
-                                                                        {question.type === QuestionTypeEnum.SHORT_ANSWER && "简答题"}
-                                                                    </div>
-                                                                </FormControl>
-                                                            </FormItem>
-
                                                             {/* 题目内容 */}
-                                                            <FormItem>
-                                                                <FormLabel>题目内容</FormLabel>
-                                                                <div className="space-y-2">
-                                                                    <FormControl>
-                                                                        <div className="px-3 py-2 border rounded-md">
-                                                                            {question.content || "无内容"}
-                                                                        </div>
-                                                                    </FormControl>
-                                                                    {question.imageUrl && (
-                                                                        <div className="mt-2 p-2 border rounded">
-                                                                            <img
-                                                                                src={question.imageUrl}
-                                                                                alt="题目图片"
-                                                                                className="max-h-40 object-contain"
-                                                                            />
-                                                                        </div>
-                                                                    )}
+                                                            <div className="space-y-3">
+                                                                <div className="prose max-w-none">
+                                                                    {question.content || "无内容"}
                                                                 </div>
-                                                            </FormItem>
-
-                                                            {/* 题目分值 */}
-                                                            <FormItem>
-                                                                <FormLabel>分值</FormLabel>
-                                                                <FormControl>
-                                                                    <div className="px-3 py-2 border rounded-md bg-muted">
-                                                                        {question.score} 分
+                                                                {question.imageUrl && (
+                                                                    <div className="mt-3 p-3 border rounded">
+                                                                        <img
+                                                                            src={question.imageUrl}
+                                                                            alt="题目图片"
+                                                                            className="max-h-40 object-contain"
+                                                                        />
                                                                     </div>
-                                                                </FormControl>
-                                                            </FormItem>
+                                                                )}
+                                                            </div>
 
                                                             {/* 选项（单选题和多选题） */}
                                                             {(question.type === QuestionTypeEnum.SINGLE_CHOICE || question.type === QuestionTypeEnum.MULTIPLE_CHOICE) && (
-                                                                <div className="space-y-4">
-                                                                    <h4 className="font-medium">选项</h4>
-                                                                    {question.options?.map((option: Option, optionIndex: number) => (
-                                                                        <div key={option.id} className="space-y-2 p-4 border rounded">
-                                                                            <div className="flex justify-between items-center">
-                                                                                <FormItem>
-                                                                                    <FormLabel>
-                                                                                        选项 {String.fromCharCode(65 + optionIndex)}
-                                                                                        {(question.type === QuestionTypeEnum.SINGLE_CHOICE && question.correctOption === optionIndex) && " (正确选项)"}
-                                                                                        {(question.type === QuestionTypeEnum.MULTIPLE_CHOICE && option.isCorrect) && " (正确选项)"}
-                                                                                    </FormLabel>
-                                                                                </FormItem>
+                                                                <div className="space-y-3">
+                                                                    <div className="space-y-2">
+                                                                        {question.options?.map((option: Option, optionIndex: number) => (
+                                                                            <div key={option.id} className="flex items-center space-x-3 p-3 ">
+                                                                                <RadioGroup>
+                                                                                    <RadioGroupItem value={option.id} disabled />
+                                                                                </RadioGroup>
+                                                                                <div>{option.content}</div>
+                                                                                {option.imageUrl && (
+                                                                                    <div className="mt-1 p-2 border rounded">
+                                                                                        <img
+                                                                                            src={option.imageUrl}
+                                                                                            alt={`选项 ${String.fromCharCode(65 + optionIndex)} 图片`}
+                                                                                            className="max-h-24 object-contain"
+                                                                                        />
+                                                                                    </div>
+                                                                                )}
+                                                                                {(question.type === QuestionTypeEnum.SINGLE_CHOICE && question.correctOption === optionIndex) && (
+                                                                                    <div className="mt-1 inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
+                                                                                        正确选项
+                                                                                    </div>
+                                                                                )}
+                                                                                {(question.type === QuestionTypeEnum.MULTIPLE_CHOICE && option.isCorrect) && (
+                                                                                    <div className="mt-1 inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
+                                                                                        正确选项
+                                                                                    </div>
+                                                                                )}
                                                                             </div>
-                                                                            <FormControl>
-                                                                                <div className="px-3 py-2 border rounded-md">
-                                                                                    {option.content}
-                                                                                </div>
-                                                                            </FormControl>
-                                                                            {option.imageUrl && (
-                                                                                <div className="mt-2 p-2 border rounded">
-                                                                                    <img
-                                                                                        src={option.imageUrl}
-                                                                                        alt={`选项 ${String.fromCharCode(65 + optionIndex)} 图片`}
-                                                                                        className="max-h-32 object-contain"
-                                                                                    />
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    ))}
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </CardContent>
