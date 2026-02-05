@@ -4,6 +4,7 @@ import { Button } from "@/ui/button";
 import { BasicStatus } from "#/enum";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 import PaperBaseTab from "./base-tab";
+import ExamTab from "./exam-tab";
 
 const tabs = [
 	{
@@ -16,7 +17,7 @@ const tabs = [
 		icon: <Icon icon="solar:clipboard-bold" size={24} className="mr-2" />,
 		key: "question",
 		title: "试题信息",
-		content: <div>Teams Tab</div>,
+		content: <ExamTab />
 	},
 	{
 		icon: <Icon icon="solar:calendar-bold" size={24} className="mr-2" />,
