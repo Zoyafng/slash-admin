@@ -6,7 +6,13 @@ export function getFrontendDashboardRoutes(): RouteObject[] {
 	const frontendDashboardRoutes: RouteObject[] = [
 		{ path: "workbench", element: Component("/pages/dashboard/workbench") },
 		{ path: "analysis", element: Component("/pages/dashboard/analysis") },
-		{ path: "paper", element: Component("/pages/management/paper") },
+		{
+			path: "paper",
+			children: [
+				{ index: true, element: Component("/pages/management/paper") },
+				{ path: ":paperId", element: Component("/pages/management/paper/detail") },
+			],
+		},
 		// {
 		// 	path: "components",
 		// 	children: [
