@@ -4,7 +4,7 @@ import { Form } from "@/ui/form"
 import { Button } from "@/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card"
 import QuestionCreateModal, { Question as QuestionType, QuestionType as QuestionTypeEnum, Option } from "../components/question-create-modal"
-import { RadioGroup, RadioGroupItem } from "@/ui/radio-group"
+
 
 // 题型分类
 enum QuestionCategory {
@@ -205,9 +205,11 @@ export default function ExamTab() {
                                                                     <div className="space-y-2">
                                                                         {question.options?.map((option: Option, optionIndex: number) => (
                                                                             <div key={option.id} className="flex items-center space-x-3 p-3 ">
-                                                                                <RadioGroup>
-                                                                                    <RadioGroupItem value={option.id} disabled />
-                                                                                </RadioGroup>
+
+                                                                                <input
+                                                                                    type="radio"
+                                                                                    disabled
+                                                                                />
                                                                                 <div>{option.content}</div>
                                                                                 {option.imageUrl && (
                                                                                     <div className="mt-1 p-2 border rounded">
@@ -218,19 +220,36 @@ export default function ExamTab() {
                                                                                         />
                                                                                     </div>
                                                                                 )}
-                                                                                {(question.type === QuestionTypeEnum.SINGLE_CHOICE && question.correctOption === optionIndex) && (
-                                                                                    <div className="mt-1 inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
-                                                                                        正确选项
-                                                                                    </div>
-                                                                                )}
-                                                                                {(question.type === QuestionTypeEnum.MULTIPLE_CHOICE && option.isCorrect) && (
-                                                                                    <div className="mt-1 inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
+
+                                                                                {(option.isCorrect) && (
+                                                                                    <div className=" inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
                                                                                         正确选项
                                                                                     </div>
                                                                                 )}
                                                                             </div>
                                                                         ))}
                                                                     </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* 答案解析 */}
+                                                            {(question.answerAnalysis || question.answerAnalysisImageUrl) && (
+                                                                <div className="space-y-3 mt-4">
+                                                                    <h4 className="font-medium">答案解析</h4>
+                                                                    {question.answerAnalysis && (
+                                                                        <div className="prose max-w-none">
+                                                                            {question.answerAnalysis}
+                                                                        </div>
+                                                                    )}
+                                                                    {question.answerAnalysisImageUrl && (
+                                                                        <div className="mt-2 p-2 border rounded">
+                                                                            <img
+                                                                                src={question.answerAnalysisImageUrl}
+                                                                                alt="解析图片"
+                                                                                className="max-h-40 object-contain"
+                                                                            />
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             )}
                                                         </CardContent>

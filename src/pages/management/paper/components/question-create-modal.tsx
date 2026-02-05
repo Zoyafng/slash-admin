@@ -30,6 +30,8 @@ export interface Question {
   options?: Option[]
   score?: number
   correctOption?: number
+  answerAnalysis?: string
+  answerAnalysisImageUrl?: string
 }
 
 // 组件 props 接口
@@ -57,7 +59,8 @@ export default function QuestionCreateModal({
         { id: crypto.randomUUID(), content: "", isCorrect: false },
         { id: crypto.randomUUID(), content: "", isCorrect: false }
       ],
-      score: 5
+      score: 5,
+      answerAnalysis: ""
     }
   )
 
@@ -246,6 +249,8 @@ export default function QuestionCreateModal({
               </FormControl>
             </FormItem>
 
+
+
             {/* 选项（单选题和多选题） */}
             {(questionData.type === QuestionType.SINGLE_CHOICE || questionData.type === QuestionType.MULTIPLE_CHOICE) && (
               <div className="space-y-4">
@@ -327,6 +332,45 @@ export default function QuestionCreateModal({
                 </Button>
               </div>
             )}
+
+            {/* 答案解析 */}
+            <FormItem>
+              <FormLabel>答案解析</FormLabel>
+              <div className="space-y-2">
+                <FormControl>
+                  <Textarea
+                    placeholder="请输入答案解析"
+                    value={questionData.answerAnalysis || ""}
+                    onChange={(e) => setQuestionData(prev => ({
+                      ...prev,
+                      answerAnalysis: e.target.value
+                    }))}
+                    className="min-h-[100px]"
+                  />
+                </FormControl>
+                {questionData.answerAnalysisImageUrl && (
+                  <div className="mt-2 p-2 border rounded">
+                    <img
+                      src={questionData.answerAnalysisImageUrl}
+                      alt="解析图片"
+                      className="max-h-40 object-contain"
+                    />
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setQuestionData(prev => ({
+                    ...prev,
+                    answerAnalysisImageUrl: `https://example.com/image-${crypto.randomUUID()}.jpg`
+                  }))}
+                >
+                  上传解析图片
+                </Button>
+
+              </div>
+            </FormItem>
           </div>
 
           <div className="flex space-x-4 pt-4">
