@@ -64,6 +64,9 @@ export default function ExamTab() {
 
     const { watch, setValue, handleSubmit } = formMethods
 
+    // 初始化时默认显示所有分类
+    const [activeCategory, setActiveCategory] = React.useState<QuestionCategory[]>([...Object.values(QuestionCategory)])
+
     // 监听分类变化
     const categories = watch("categories")
 
@@ -120,13 +123,18 @@ export default function ExamTab() {
         // 实际项目中需要调用 API 保存数据
     }
 
-    const [activeCategory, setActiveCategory] = React.useState<QuestionCategory[]>([])
 
     return (
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>试卷题目管理</CardTitle>
+                    <div className="flex justify-between items-center">
+                        <CardTitle>试卷题目管理</CardTitle>
+                        {/* 提交按钮 */}
+                        <Button type="submit">
+                            保存试卷
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <Form {...formMethods}>
@@ -305,10 +313,7 @@ export default function ExamTab() {
                                 editingQuestion={editingQuestion}
                                 categoryName={categories[currentCategoryIndex]?.name}
                             />
-                            {/* 提交按钮 */}
-                            <Button type="submit">
-                                保存试卷
-                            </Button>
+
                         </form>
                     </Form>
                 </CardContent>
