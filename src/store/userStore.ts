@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 import userService, { type SignInReq } from "@/api/services/userService";
 
@@ -62,8 +62,12 @@ export const useSignIn = () => {
 
 	const signIn = async (data: SignInReq) => {
 		try {
-			const res = await signInMutation.mutateAsync(data);
-			const { user, accessToken, refreshToken } = res;
+			// const res = await signInMutation.mutateAsync(data);
+			const { user, accessToken, refreshToken } = {
+				user:"zoyafng",
+				accessToken:"accessToken",
+				refreshToken:"refreshToken"
+			};
 			setUserToken({ accessToken, refreshToken });
 			setUserInfo(user);
 		} catch (err) {
