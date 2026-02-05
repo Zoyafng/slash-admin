@@ -29,7 +29,6 @@ export interface Question {
   imageUrl?: string
   options?: Option[]
   score?: number
-  correctOption?: number
   answerAnalysis?: string
   answerAnalysisImageUrl?: string
 }
@@ -96,21 +95,25 @@ export default function QuestionCreateModal({
     }))
   }
 
-  // 处理正确选项变化（单选题）
-  const handleCorrectOptionChange = (optionIndex: number) => {
+  // 处理正确选项变化
+  const handleOptionCorrectnessChange = (optionIndex: number, isCorrect: boolean) => {
     setQuestionData(prev => ({
       ...prev,
-      correctOption: optionIndex
-    }))
-  }
-
-  // 处理正确选项变化（多选题）
-  const handleMultipleCorrectOptionChange = (optionIndex: number, isCorrect: boolean) => {
-    setQuestionData(prev => ({
-      ...prev,
-      options: prev.options?.map((opt, idx) =>
-        idx === optionIndex ? { ...opt, isCorrect } : opt
-      )
+      options: prev.options?.map((opt, idx) => {
+        if (prev.type === QuestionType.SINGLE_CHOICE) {
+          // 单选题：只有当前选项为正确
+          return {
+            ...opt,
+            isCorrect: idx === optionIndex
+          }
+        } else {
+          // 多选题：根据传入的 isCorrect 值设置
+          return {
+            ...opt,
+            isCorrect: idx === optionIndex ? isCorrect : opt.isCorrect
+          }
+        }
+      })
     }))
   }
 
@@ -261,8 +264,7 @@ export default function QuestionCreateModal({
                       <FormItem>
                         <FormLabel>
                           选项 {String.fromCharCode(65 + optionIndex)}
-                          {(questionData.type === QuestionType.SINGLE_CHOICE && questionData.correctOption === optionIndex) && " (正确选项)"}
-                          {(questionData.type === QuestionType.MULTIPLE_CHOICE && option.isCorrect) && " (正确选项)"}
+                          {(option.isCorrect) && " (正确选项)"}
                         </FormLabel>
                       </FormItem>
                       <Button
@@ -303,10 +305,10 @@ export default function QuestionCreateModal({
                         <FormItem className="flex items-center space-x-2">
                           <input
                             type="radio"
-                            checked={questionData.correctOption === optionIndex}
-                            onChange={() => handleCorrectOptionChange(optionIndex)}
+                            checked={option.isCorrect || false}
+                            onChange={() => handleOptionCorrectnessChange(optionIndex, true)}
                           />
-                          <FormLabel className="mb-0">正确选项</FormLabel>
+                          <FormLabel className="mb-0" onClick={() => handleOptionCorrectnessChange(optionIndex, true)}>正确选项</FormLabel>
                         </FormItem>
                       )}
                       {questionData.type === QuestionType.MULTIPLE_CHOICE && (
@@ -314,9 +316,9 @@ export default function QuestionCreateModal({
                           <input
                             type="checkbox"
                             checked={option.isCorrect || false}
-                            onChange={(e) => handleMultipleCorrectOptionChange(optionIndex, e.target.checked)}
+                            onChange={(e) => handleOptionCorrectnessChange(optionIndex, e.target.checked)}
                           />
-                          <FormLabel className="mb-0">正确选项</FormLabel>
+                          <FormLabel className="mb-0" onClick={() => handleOptionCorrectnessChange(optionIndex, !option.isCorrect)}>正确选项</FormLabel>
                         </FormItem>
                       )}
                     </div>
