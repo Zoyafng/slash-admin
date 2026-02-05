@@ -72,6 +72,7 @@
 		"nav": {
 			"dashboard": "Dashboard",
 			"pages": "Pages",
+			"paper_management": "Paper Management",
 			"others": "Others",
 			"ui": "UI",
 			"custom_ui_components": "Custom UI Components",

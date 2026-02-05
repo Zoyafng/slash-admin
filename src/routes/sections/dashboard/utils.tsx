@@ -28,5 +28,6 @@ export const Component = (path = "", props?: any): React.ReactNode => {
 		Element = lazy(importFn as any);
 		lazyComponentCache.set(path, Element);
 	}
+	console.log(path, "Element");
 	return <Element {...props} />;
 };

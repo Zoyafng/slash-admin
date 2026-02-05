@@ -86,6 +86,7 @@
 		"nav": {
 			"dashboard": "仪表板",
 			"pages": "页面",
+			"paper_management": "试卷管理",
 			"others": "其他",
 			"ui": "UI",
 			"custom_ui_components": "自定义UI组件",

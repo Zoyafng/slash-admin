@@ -31,6 +31,7 @@ function PcLayout() {
 	const { themeLayout } = useSettings();
 
 	if (themeLayout === ThemeLayout.Horizontal) return <PcHorizontalLayout />;
+
 	return <PcVerticalLayout />;
 }
 

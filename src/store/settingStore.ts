@@ -16,6 +16,7 @@ export type SettingsType = {
 	fontFamily: string;
 	fontSize: number;
 	direction: "ltr" | "rtl";
+	menuCollapsed: boolean;
 };
 type SettingStore = {
 	settings: SettingsType;
@@ -38,6 +39,7 @@ const useSettingStore = create<SettingStore>()(
 				accordion: false,
 				multiTab: false,
 				darkSidebar: false,
+				menuCollapsed: false,
 				fontFamily: FontFamilyPreset.openSans,
 				fontSize: Number(typographyTokens.fontSize.sm),
 				direction: "ltr",
