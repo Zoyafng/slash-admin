@@ -1,158 +1,115 @@
+import * as React from "react"
 import { useForm } from "react-hook-form"
 import { Form, FormItem, FormLabel, FormControl } from "@/ui/form"
 import { Button } from "@/ui/button"
-import { Input } from "@/ui/input"
-import { Textarea } from "@/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card"
+import QuestionCreateModal, { Question as QuestionType, QuestionType as QuestionTypeEnum, Option } from "../components/question-create-modal"
 
-// 题目类型
-enum QuestionType {
-    SINGLE_CHOICE = "single_choice",
-    MULTIPLE_CHOICE = "multiple_choice",
-    SHORT_ANSWER = "short_answer"
+// 题型分类
+enum QuestionCategory {
+    GENERAL_KNOWLEDGE = "general_knowledge",
+    QUANTITATIVE_REASONING = "quantitative_reasoning",
+    VERBAL_ABILITY = "verbal_ability",
+    LOGICAL_REASONING = "logical_reasoning"
 }
 
-// 题目数据结构
-interface Question {
+// 题型分类数据结构
+interface QuestionCategoryData {
     id: string
-    type: QuestionType
-    content: string
-    imageUrl?: string
-    options?: Option[]
-    score?: number
-    correctOption?: number
-}
-
-// 选项数据结构
-interface Option {
-    id: string
-    content: string
-    imageUrl?: string
-    isCorrect?: boolean
+    category: QuestionCategory
+    name: string
+    questions: QuestionType[]
 }
 
 // 表单数据结构
 interface FormData {
-    questions: Question[]
+    categories: QuestionCategoryData[]
 }
 
 export default function ExamTab() {
     // 初始化表单
     const formMethods = useForm<FormData>({
         defaultValues: {
-            questions: []
-        }
-    })
-
-    const { register, watch, setValue, handleSubmit } = formMethods
-
-    // 监听题目变化
-    const questions = watch("questions")
-
-    // 添加新题目
-    const addQuestion = () => {
-        const newQuestion: Question = {
-            id: crypto.randomUUID(),
-            type: QuestionType.SINGLE_CHOICE,
-            content: "",
-            options: [
+            categories: [
                 {
                     id: crypto.randomUUID(),
-                    content: "",
-                    isCorrect: false
+                    category: QuestionCategory.GENERAL_KNOWLEDGE,
+                    name: "常识判断",
+                    questions: []
                 },
                 {
                     id: crypto.randomUUID(),
-                    content: "",
-                    isCorrect: false
+                    category: QuestionCategory.QUANTITATIVE_REASONING,
+                    name: "数量关系",
+                    questions: []
+                },
+                {
+                    id: crypto.randomUUID(),
+                    category: QuestionCategory.VERBAL_ABILITY,
+                    name: "言语理解",
+                    questions: []
+                },
+                {
+                    id: crypto.randomUUID(),
+                    category: QuestionCategory.LOGICAL_REASONING,
+                    name: "逻辑推理",
+                    questions: []
                 }
-            ],
-            score: 5
+            ]
         }
+    })
 
-        setValue("questions", [...questions, newQuestion])
+    const { watch, setValue, handleSubmit } = formMethods
+
+    // 监听分类变化
+    const categories = watch("categories")
+
+    // 模态框状态
+    const [isDialogOpen, setIsDialogOpen] = React.useState(false)
+    const [currentCategoryIndex, setCurrentCategoryIndex] = React.useState<number>(0)
+    const [editingQuestion, setEditingQuestion] = React.useState<QuestionType | null>(null)
+    const [editingQuestionIndex, setEditingQuestionIndex] = React.useState<number | null>(null)
+
+    // 打开添加题目模态框
+    const openAddQuestionDialog = (categoryIndex: number) => {
+        setCurrentCategoryIndex(categoryIndex)
+        setEditingQuestion(null)
+        setEditingQuestionIndex(null)
+        setIsDialogOpen(true)
     }
 
-    // 删除题目
-    const removeQuestion = (index: number) => {
-        const updatedQuestions = questions.filter((_: Question, i: number) => i !== index)
-        setValue("questions", updatedQuestions)
+    // 打开编辑题目模态框
+    const openEditQuestionDialog = (categoryIndex: number, questionIndex: number) => {
+        setCurrentCategoryIndex(categoryIndex)
+        setEditingQuestion({ ...categories[categoryIndex].questions[questionIndex] })
+        setEditingQuestionIndex(questionIndex)
+        setIsDialogOpen(true)
     }
 
-    // 添加选项
-    const addOption = (questionIndex: number) => {
-        const updatedQuestions = [...questions]
-        const question = updatedQuestions[questionIndex]
+    // 保存题目到指定分类
+    const saveQuestion = (questionData: QuestionType) => {
+        const updatedCategories = [...categories]
 
-        if (question.options) {
-            question.options.push({
-                id: crypto.randomUUID(),
-                content: "",
-                isCorrect: false
-            })
-            setValue("questions", updatedQuestions)
-        }
-    }
-
-    // 删除选项
-    const removeOption = (questionIndex: number, optionIndex: number) => {
-        const updatedQuestions = [...questions]
-        const question = updatedQuestions[questionIndex]
-
-        if (question.options) {
-            question.options = question.options.filter((_: Option, i: number) => i !== optionIndex)
-            setValue("questions", updatedQuestions)
-        }
-    }
-
-    // 切换题目类型
-    const changeQuestionType = (questionIndex: number, type: QuestionType) => {
-        const updatedQuestions = [...questions]
-        const question = updatedQuestions[questionIndex]
-
-        question.type = type
-
-        // 根据题目类型初始化选项
-        if (type === QuestionType.SINGLE_CHOICE || type === QuestionType.MULTIPLE_CHOICE) {
-            if (!question.options || question.options.length === 0) {
-                question.options = [
-                    {
-                        id: crypto.randomUUID(),
-                        content: "",
-                        isCorrect: false
-                    },
-                    {
-                        id: crypto.randomUUID(),
-                        content: "",
-                        isCorrect: false
-                    }
-                ]
-            }
+        if (editingQuestionIndex !== null) {
+            // 编辑现有题目
+            updatedCategories[currentCategoryIndex].questions[editingQuestionIndex] = questionData
         } else {
-            // 简答题不需要选项
-            question.options = undefined
+            // 添加新题目
+            updatedCategories[currentCategoryIndex].questions.push(questionData)
         }
 
-        setValue("questions", updatedQuestions)
+        setValue("categories", updatedCategories)
+        setIsDialogOpen(false)
     }
 
-    // 处理图片上传（这里只是模拟实现，实际需要调用上传接口）
-    const handleImageUpload = (questionIndex: number, isOption: boolean, optionIndex?: number) => {
-        // 模拟图片上传，实际项目中需要实现真实的上传逻辑
-        const imageUrl = `https://example.com/image-${crypto.randomUUID()}.jpg`
-
-        const updatedQuestions = [...questions]
-        const question = updatedQuestions[questionIndex]
-
-        if (isOption && optionIndex !== undefined && question.options) {
-            question.options[optionIndex].imageUrl = imageUrl
-        } else {
-            question.imageUrl = imageUrl
-        }
-
-        setValue("questions", updatedQuestions)
+    // 删除指定分类中的题目
+    const removeQuestion = (categoryIndex: number, questionIndex: number) => {
+        const updatedCategories = [...categories]
+        updatedCategories[categoryIndex].questions = updatedCategories[categoryIndex].questions.filter((_: QuestionType, i: number) => i !== questionIndex)
+        setValue("categories", updatedCategories)
     }
+
+
 
     // 提交表单
     const onSubmit = (data: FormData) => {
@@ -169,193 +126,144 @@ export default function ExamTab() {
                 <CardContent>
                     <Form {...formMethods}>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                            {/* 题目列表 */}
+                            {/* 分类列表 */}
                             <div className="space-y-8">
-                                {questions.map((question: Question, questionIndex: number) => (
-                                    <Card key={question.id} className="border">
-                                        <CardHeader className="pb-2">
-                                            <div className="flex justify-between items-center">
-                                                <CardTitle className="text-lg">
-                                                    题目 {questionIndex + 1}
-                                                </CardTitle>
-                                                <div className="flex space-x-2">
-                                                    <Button
-                                                        type="button"
-                                                        variant="secondary"
-                                                        size="sm"
-                                                        onClick={() => removeQuestion(questionIndex)}
-                                                    >
-                                                        删除题目
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent className="space-y-4">
-                                            {/* 题目类型选择 */}
-                                            <FormItem>
-                                                <FormLabel>题目类型</FormLabel>
-                                                <FormControl>
-                                                    <Select
-                                                        value={question.type}
-                                                        onValueChange={(value) => changeQuestionType(questionIndex, value as QuestionType)}
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="选择题目类型" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value={QuestionType.SINGLE_CHOICE}>
-                                                                单选题
-                                                            </SelectItem>
-                                                            <SelectItem value={QuestionType.MULTIPLE_CHOICE}>
-                                                                多选题
-                                                            </SelectItem>
-                                                            <SelectItem value={QuestionType.SHORT_ANSWER}>
-                                                                简答题
-                                                            </SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormControl>
-                                            </FormItem>
+                                {categories.map((category, categoryIndex) => (
+                                    <div key={category.id} className="space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <h3 className="text-xl font-semibold">{category.name}</h3>
+                                            <Button
+                                                type="button"
+                                                onClick={() => openAddQuestionDialog(categoryIndex)}
+                                            >
+                                                添加题目
+                                            </Button>
 
-                                            {/* 题目内容 */}
-                                            <FormItem>
-                                                <FormLabel>题目内容</FormLabel>
-                                                <div className="space-y-2">
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="请输入题目内容"
-                                                            {...register(`questions.${questionIndex}.content`, {
-                                                                required: "题目内容不能为空"
-                                                            })}
-                                                        />
-                                                    </FormControl>
-                                                    <Button
-                                                        type="button"
-                                                        variant="secondary"
-                                                        size="sm"
-                                                        onClick={() => handleImageUpload(questionIndex, false)}
-                                                    >
-                                                        上传题目图片
-                                                    </Button>
-                                                    {question.imageUrl && (
-                                                        <div className="mt-2 p-2 border rounded">
-                                                            <img
-                                                                src={question.imageUrl}
-                                                                alt="题目图片"
-                                                                className="max-h-40 object-contain"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </FormItem>
+                                        </div>
 
-                                            {/* 题目分值 */}
-                                            <FormItem>
-                                                <FormLabel>分值</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        min="0"
-                                                        step="1"
-                                                        {...register(`questions.${questionIndex}.score`, {
-                                                            required: "分值不能为空",
-                                                            min: {
-                                                                value: 0,
-                                                                message: "分值不能为负数"
-                                                            }
-                                                        })}
-                                                    />
-                                                </FormControl>
-                                            </FormItem>
-
-                                            {/* 选项（单选题和多选题） */}
-                                            {(question.type === QuestionType.SINGLE_CHOICE || question.type === QuestionType.MULTIPLE_CHOICE) && (
-                                                <div className="space-y-4">
-                                                    <h4 className="font-medium">选项</h4>
-                                                    {question.options?.map((option: Option, optionIndex: number) => (
-                                                        <div key={option.id} className="space-y-2 p-4 border rounded">
+                                        {/* 题目列表 */}
+                                        <div className="space-y-6">
+                                            {
+                                                category.questions.map((question, questionIndex) => (
+                                                    <Card key={question.id} className="border">
+                                                        <CardHeader className="pb-2">
                                                             <div className="flex justify-between items-center">
-                                                                <FormItem>
-                                                                    <FormLabel>选项 {String.fromCharCode(65 + optionIndex)}</FormLabel>
-                                                                </FormItem>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="secondary"
-                                                                    size="sm"
-                                                                    onClick={() => removeOption(questionIndex, optionIndex)}
-                                                                >
-                                                                    删除选项
-                                                                </Button>
+                                                                <CardTitle className="text-lg">
+                                                                    题目 {questionIndex + 1}
+                                                                </CardTitle>
+                                                                <div className="flex space-x-2">
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="secondary"
+                                                                        size="sm"
+                                                                        onClick={() => openEditQuestionDialog(categoryIndex, questionIndex)}
+                                                                    >
+                                                                        编辑题目
+                                                                    </Button>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="secondary"
+                                                                        size="sm"
+                                                                        onClick={() => removeQuestion(categoryIndex, questionIndex)}
+                                                                    >
+                                                                        删除题目
+                                                                    </Button>
+                                                                </div>
                                                             </div>
-                                                            <FormControl>
-                                                                <Input
-                                                                    placeholder="请输入选项内容"
-                                                                    {...register(`questions.${questionIndex}.options.${optionIndex}.content`, {
-                                                                        required: "选项内容不能为空"
-                                                                    })}
-                                                                />
-                                                            </FormControl>
-                                                            <div className="flex space-x-2">
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="secondary"
-                                                                    size="sm"
-                                                                    onClick={() => handleImageUpload(questionIndex, true, optionIndex)}
-                                                                >
-                                                                    上传选项图片
-                                                                </Button>
-                                                                {question.type === QuestionType.SINGLE_CHOICE && (
-                                                                    <FormItem className="flex items-center space-x-2">
-                                                                        <input
-                                                                            type="radio"
-                                                                            {...register(`questions.${questionIndex}.correctOption`, {
-                                                                                required: "请选择正确选项"
-                                                                            })}
-                                                                            value={optionIndex}
-                                                                        />
-                                                                        <FormLabel className="mb-0">正确选项</FormLabel>
-                                                                    </FormItem>
-                                                                )}
-                                                                {question.type === QuestionType.MULTIPLE_CHOICE && (
-                                                                    <FormItem className="flex items-center space-x-2">
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            {...register(`questions.${questionIndex}.options.${optionIndex}.isCorrect`)}
-                                                                        />
-                                                                        <FormLabel className="mb-0">正确选项</FormLabel>
-                                                                    </FormItem>
-                                                                )}
-                                                            </div>
-                                                            {option.imageUrl && (
-                                                                <div className="mt-2 p-2 border rounded">
-                                                                    <img
-                                                                        src={option.imageUrl}
-                                                                        alt={`选项 ${String.fromCharCode(65 + optionIndex)} 图片`}
-                                                                        className="max-h-32 object-contain"
-                                                                    />
+                                                        </CardHeader>
+                                                        <CardContent className="space-y-4">
+                                                            {/* 题目类型显示 */}
+                                                            <FormItem>
+                                                                <FormLabel>题目类型</FormLabel>
+                                                                <FormControl>
+                                                                    <div className="px-3 py-2 border rounded-md bg-muted">
+                                                                        {question.type === QuestionTypeEnum.SINGLE_CHOICE && "单选题"}
+                                                                        {question.type === QuestionTypeEnum.MULTIPLE_CHOICE && "多选题"}
+                                                                        {question.type === QuestionTypeEnum.SHORT_ANSWER && "简答题"}
+                                                                    </div>
+                                                                </FormControl>
+                                                            </FormItem>
+
+                                                            {/* 题目内容 */}
+                                                            <FormItem>
+                                                                <FormLabel>题目内容</FormLabel>
+                                                                <div className="space-y-2">
+                                                                    <FormControl>
+                                                                        <div className="px-3 py-2 border rounded-md">
+                                                                            {question.content || "无内容"}
+                                                                        </div>
+                                                                    </FormControl>
+                                                                    {question.imageUrl && (
+                                                                        <div className="mt-2 p-2 border rounded">
+                                                                            <img
+                                                                                src={question.imageUrl}
+                                                                                alt="题目图片"
+                                                                                className="max-h-40 object-contain"
+                                                                            />
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </FormItem>
+
+                                                            {/* 题目分值 */}
+                                                            <FormItem>
+                                                                <FormLabel>分值</FormLabel>
+                                                                <FormControl>
+                                                                    <div className="px-3 py-2 border rounded-md bg-muted">
+                                                                        {question.score} 分
+                                                                    </div>
+                                                                </FormControl>
+                                                            </FormItem>
+
+                                                            {/* 选项（单选题和多选题） */}
+                                                            {(question.type === QuestionTypeEnum.SINGLE_CHOICE || question.type === QuestionTypeEnum.MULTIPLE_CHOICE) && (
+                                                                <div className="space-y-4">
+                                                                    <h4 className="font-medium">选项</h4>
+                                                                    {question.options?.map((option: Option, optionIndex: number) => (
+                                                                        <div key={option.id} className="space-y-2 p-4 border rounded">
+                                                                            <div className="flex justify-between items-center">
+                                                                                <FormItem>
+                                                                                    <FormLabel>
+                                                                                        选项 {String.fromCharCode(65 + optionIndex)}
+                                                                                        {(question.type === QuestionTypeEnum.SINGLE_CHOICE && question.correctOption === optionIndex) && " (正确选项)"}
+                                                                                        {(question.type === QuestionTypeEnum.MULTIPLE_CHOICE && option.isCorrect) && " (正确选项)"}
+                                                                                    </FormLabel>
+                                                                                </FormItem>
+                                                                            </div>
+                                                                            <FormControl>
+                                                                                <div className="px-3 py-2 border rounded-md">
+                                                                                    {option.content}
+                                                                                </div>
+                                                                            </FormControl>
+                                                                            {option.imageUrl && (
+                                                                                <div className="mt-2 p-2 border rounded">
+                                                                                    <img
+                                                                                        src={option.imageUrl}
+                                                                                        alt={`选项 ${String.fromCharCode(65 + optionIndex)} 图片`}
+                                                                                        className="max-h-32 object-contain"
+                                                                                    />
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    ))}
                                                                 </div>
                                                             )}
-                                                        </div>
-                                                    ))}
-                                                    <Button
-                                                        type="button"
-                                                        variant="secondary"
-                                                        onClick={() => addOption(questionIndex)}
-                                                    >
-                                                        添加选项
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </CardContent>
-                                    </Card>
+                                                        </CardContent>
+                                                    </Card>
+                                                ))
+                                            }
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
-
-                            {/* 添加题目按钮 */}
-                            <Button type="button" onClick={addQuestion}>
-                                添加题目
-                            </Button>
-
+                            {/* 题目创建弹窗 */}
+                            <QuestionCreateModal
+                                open={isDialogOpen}
+                                onOpenChange={setIsDialogOpen}
+                                onSave={saveQuestion}
+                                editingQuestion={editingQuestion}
+                                categoryName={categories[currentCategoryIndex]?.name}
+                            />
                             {/* 提交按钮 */}
                             <Button type="submit">
                                 保存试卷
@@ -363,8 +271,8 @@ export default function ExamTab() {
                         </form>
                     </Form>
                 </CardContent>
-            </Card>
-        </div>
+            </Card >
+        </div >
     )
 }
 
