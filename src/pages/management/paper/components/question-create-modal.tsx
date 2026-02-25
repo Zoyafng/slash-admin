@@ -185,7 +185,7 @@ export default function QuestionCreateModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-6xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editingQuestion ? "编辑题目" : "添加题目"}</DialogTitle>
         </DialogHeader>
