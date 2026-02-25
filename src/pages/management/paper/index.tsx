@@ -1,4 +1,3 @@
-// import { USER_LIST } from "@/_mock/assets";
 import { Icon } from "@/components/icon";
 import { usePathname, useRouter } from "@/routes/hooks";
 import { Badge } from "@/ui/badge";
@@ -6,7 +5,6 @@ import { Button } from "@/ui/button";
 import { Card, CardContent, CardHeader } from "@/ui/card";
 import { Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import type { Role_Old, UserInfo } from "#/entity";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -48,7 +46,6 @@ const reducer = (state: typeof initState, action: { type: string; payload: any }
 
 
 
-const USERS: UserInfo[] = [];
 
 const paperMock = [
 	{

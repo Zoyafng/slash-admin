@@ -5,17 +5,18 @@ import { BasicStatus } from "#/enum";
 
 
 export default function PaperBaseTab() {
-    const paperId = useParams().paperId;
+    const userId = useParams().userId;
     // TODO: 从API获取paper详情数据
     const paper = {
-        id: paperId,
-        name: "示例套卷",
-        description: "这是一个示例套卷，包含多种类型的题目",
-        status: BasicStatus.ENABLE,
-        totalQuestions: 50,
-        timeLimit: 120,
+        id: userId,
+        isAuth: true,
+        name: "王艺淼",
+        major: "信息工程",
+        school: "中国科技大学",
+        phone: "13800000000",
         createdAt: "2026-02-05",
-        updatedAt: "2026-02-05"
+        updatedAt: "2026-02-05",
+        status:0
     };
 
 
@@ -25,39 +26,35 @@ export default function PaperBaseTab() {
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <div className="text-sm text-text-secondary">套卷ID</div>
+                            <div className="text-sm text-text-secondary">用户 ID</div>
                             <div className="font-medium">{paper.id}</div>
                         </div>
                         <div className="space-y-2">
-                            <div className="text-sm text-text-secondary">套卷名称</div>
+                            <div className="text-sm text-text-secondary">用户名</div>
                             <div className="font-medium">{paper.name}</div>
                         </div>
                         <div className="space-y-2">
-                            <div className="text-sm text-text-secondary">状态</div>
+                            <div className="text-sm text-text-secondary">是否授权</div>
                             <Badge variant={paper.status === BasicStatus.DISABLE ? "error" : "success"}>
                                 {paper.status === BasicStatus.DISABLE ? "禁用" : "启用"}
                             </Badge>
                         </div>
                         <div className="space-y-2">
-                            <div className="text-sm text-text-secondary">题目数量</div>
-                            <div className="font-medium">{paper.totalQuestions} 题</div>
+                            <div className="text-sm text-text-secondary">手机号</div>
+                            <div className="font-medium">{paper.phone} 题</div>
                         </div>
                         <div className="space-y-2">
-                            <div className="text-sm text-text-secondary">考试时长</div>
-                            <div className="font-medium">{paper.timeLimit} 分钟</div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="text-sm text-text-secondary">创建时间</div>
+                            <div className="text-sm text-text-secondary">注册时间</div>
                             <div className="font-medium">{paper.createdAt}</div>
                         </div>
                         <div className="space-y-2">
-                            <div className="text-sm text-text-secondary">更新时间</div>
-                            <div className="font-medium">{paper.updatedAt}</div>
+                            <div className="text-sm text-text-secondary">学校</div>
+                            <div className="font-medium">{paper.school}</div>
                         </div>
-                    </div>
-                    <div className="space-y-2">
-                        <div className="text-sm text-text-secondary">套卷描述</div>
-                        <div className="p-4 border rounded-md">{paper.description}</div>
+                        <div className="space-y-2">
+                            <div className="text-sm text-text-secondary">专业</div>
+                            <div className="font-medium">{paper.major}</div>
+                        </div>
                     </div>
                 </div>
             </CardContent>

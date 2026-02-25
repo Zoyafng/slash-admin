@@ -2,6 +2,9 @@ import type { RouteObject } from "react-router";
 // import { Navigate } from "react-router";
 import { Component } from "./utils";
 
+/**
+ * 前端路由配置
+ */
 export function getFrontendDashboardRoutes(): RouteObject[] {
 	const frontendDashboardRoutes: RouteObject[] = [
 		{ path: "workbench", element: Component("/pages/dashboard/workbench") },
@@ -11,6 +14,13 @@ export function getFrontendDashboardRoutes(): RouteObject[] {
 			children: [
 				{ index: true, element: Component("/pages/management/paper") },
 				{ path: ":paperId", element: Component("/pages/management/paper/detail") },
+			],
+		},
+		{
+			path: "user",
+			children: [
+				{ index: true, element: Component("/pages/management/user") },
+				{ path: ":userId", element: Component("/pages/management/user/detail") },
 			],
 		},
 		// {

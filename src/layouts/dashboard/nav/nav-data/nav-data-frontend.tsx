@@ -21,6 +21,11 @@ export const frontendNavData: NavProps["data"] = [
 				path: "/paper",
 				icon: <Icon icon="solar:clipboard-bold-duotone" size="24" />,
 			},
+			{
+				title: "sys.nav.user_management",
+				path: "/user",
+				icon: <Icon icon="local:ic-user" size="24" />,
+			}
 		],
 	},
 	// {
