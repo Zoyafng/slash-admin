@@ -7,8 +7,9 @@ function Progress({
   className,
   value,
   color = "primary",
+  showValue = false,
   ...props
-}: React.ComponentProps<typeof ProgressPrimitive.Root>) {
+}: React.ComponentProps<typeof ProgressPrimitive.Root > & { showValue?: boolean }) {
   return (
     <>
       <ProgressPrimitive.Root
@@ -26,9 +27,9 @@ function Progress({
         />
 
       </ProgressPrimitive.Root>
-      <div className="absolute top-3 left-0 flex items-center justify-center h-full w-full text-[10px] font-medium text-black">
+      {showValue && <div className="absolute top-3 left-0 flex items-center justify-center h-full w-full text-[10px] font-medium text-black">
         {value}%
-      </div>
+      </div>}
     </>
   )
 }

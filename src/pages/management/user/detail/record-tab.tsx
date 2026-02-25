@@ -85,8 +85,12 @@ export default function RecordTab() {
     // 子表格列配置
     const subColumns: ColumnsType<any> = [
         {
+            title: "题目类型",
             dataIndex: "category",
-            width: 180
+            width: 180,
+            render: (category: QuestionCategory) => {
+                return category
+            }
         },
         {
             title: "得分",
@@ -118,7 +122,7 @@ export default function RecordTab() {
                 } else if (percent < 100) {
                     color = 'warning';
                 }
-                return <Progress value={percent} color={color} />;
+                return <Progress value={percent} color={color} showValue />;
             },
         },
         {
@@ -137,7 +141,8 @@ export default function RecordTab() {
                 } else if (percent < 100) {
                     color = 'warning';
                 }
-                return <Progress value={percent} color={color} />;
+                console.log(percent, "percent", color)
+                return <Progress value={percent} color={color} showValue />;
             },
         },
         {

@@ -33,7 +33,35 @@ export default function ExamTab() {
                     id: crypto.randomUUID(),
                     category: QuestionCategory.GENERAL_KNOWLEDGE,
                     name: "常识判断",
-                    questions: []
+                    questions: [{
+                        "id": "6bbcf5c6-9adb-46aa-8187-57d70fa055a0",
+                        "type": "single_choice",
+                        "content": "我国语言文字博大精深，源远流长，是中华文化的重要载体。关于我国语言文字，下列说法不正确的是：",
+                        "options": [
+                            {
+                                "id": "fe32a4b3-94a0-4ab8-b194-7612a0a51953",
+                                "content": "我国共有分属汉藏、阿尔泰、南亚、南岛、印欧五大语系的包括汉语在内130余种语言",
+                                "isCorrect": false
+                            },
+                            {
+                                "id": "10e88bdc-e75d-4ea4-b7a6-8c84abc2f6a5",
+                                "content": "周代“雅言”、秦代“书同文”、汉代“通语”、宋元“正音”、明清“官话”体现的是我国通用语言文字传统",
+                                "isCorrect": false
+                            },
+                            {
+                                "id": "671c40f6-3a77-4e9b-b179-cfbadf9d8851",
+                                "content": "我国各民族在历史上曾经创造过众多文字种类，大多数民族语言都有与之相适应的文字，这些文字具有通用性",
+                                "isCorrect": true
+                            },
+                            {
+                                "id": "7b0717b1-bbca-4159-bc75-2950d6c33a29",
+                                "content": "甲骨文已成功申报“世界记忆名录”，这是中华语言文明走向国际社会的实证",
+                                "isCorrect": false
+                            }
+                        ],
+                        "score": 5,
+                        "answerAnalysis": "解析\n本题考查人文常识。\nA项正确，中国民族语言，按语言谱系分类法，大体上分别属于汉藏、阿尔泰、南亚、南岛、印欧五大语系。其中，汉语属于汉藏语系，而其他少数民族语言则分属不同的语系。据统计，中国境内共有130多种语言。\nB项正确，中国历史上一直有通用语言文字的传统，这些通用语言在不同时期有不同的名称：周代“雅言”、秦代“书同文”、汉代“通语”、宋元“正音”、明清“官话”。这些不同历史时期的通用语言文字，反映了我国在语言规范化、标准化方面的不断努力和传承，体现了中华民族对语言文字统一和规范的重视，反映了我国通用语言文字的传统。\nC项错误，我国各民族在历史上确实创造过多种文字，但并不是大多数民族语言都有与之相适应的文字，而且这些文字并不都具有通用性。许多少数民族语言在历史上并没有发展出独立的文字系统，或者其文字系统并未广泛使用。同时，不同民族的文字系统之间并不具有通用性，它们各自服务于特定的语言和文化群体。\nD项正确，2017年11月24日，甲骨文成功入选《世界记忆名录》，成为了世界文化交流与传承的重要桥梁。甲骨文作为我国目前已知最早的成体系的文字形式，承载着殷商时期大量的政治、经济、文化等信息。它成功入选，无疑是中华语言文明走向国际社会，被世界认可和重视的有力实证。\n本题为选非题，故正确答案为C。"
+                    }]
                 },
                 {
                     id: crypto.randomUUID(),
@@ -64,39 +92,45 @@ export default function ExamTab() {
 
     // 监听分类变化
     const categories = watch("categories")
+    console.log(categories, "categories")
 
     // 模态框状态
     const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-    const [currentCategoryIndex, setCurrentCategoryIndex] = React.useState<number>(0)
+    const [currentCategoryId, setCurrentCategoryId] = React.useState<string>("")
     const [editingQuestion, setEditingQuestion] = React.useState<QuestionType | null>(null)
-    const [editingQuestionIndex, setEditingQuestionIndex] = React.useState<number | null>(null)
 
     // 打开添加题目模态框
-    const openAddQuestionDialog = (categoryIndex: number) => {
-        setCurrentCategoryIndex(categoryIndex)
+    const openAddQuestionDialog = (categoryId: string) => {
+        setCurrentCategoryId(categoryId)
         setEditingQuestion(null)
-        setEditingQuestionIndex(null)
         setIsDialogOpen(true)
     }
 
     // 打开编辑题目模态框
-    const openEditQuestionDialog = (categoryIndex: number, questionIndex: number) => {
-        setCurrentCategoryIndex(categoryIndex)
-        setEditingQuestion({ ...categories[categoryIndex].questions[questionIndex] })
-        setEditingQuestionIndex(questionIndex)
+    const openEditQuestionDialog = (categoryId: string, question: QuestionType) => {
+        setCurrentCategoryId(categoryId)
+        setEditingQuestion({ ...question })
         setIsDialogOpen(true)
     }
 
     // 保存题目到指定分类
     const saveQuestion = (questionData: QuestionType) => {
+        console.log(questionData, "questionData")
         const updatedCategories = [...categories]
 
-        if (editingQuestionIndex !== null) {
+        // 找到当前分类
+        const categoryIndex = updatedCategories.findIndex(cat => cat.id === currentCategoryId)
+        if (categoryIndex === -1) return
+
+        if (editingQuestion) {
             // 编辑现有题目
-            updatedCategories[currentCategoryIndex].questions[editingQuestionIndex] = questionData
+            const questionIndex = updatedCategories[categoryIndex].questions.findIndex(q => q.id === editingQuestion.id)
+            if (questionIndex !== -1) {
+                updatedCategories[categoryIndex].questions[questionIndex] = questionData
+            }
         } else {
             // 添加新题目
-            updatedCategories[currentCategoryIndex].questions.push(questionData)
+            updatedCategories[categoryIndex].questions.push(questionData)
         }
 
         setValue("categories", updatedCategories)
@@ -104,9 +138,11 @@ export default function ExamTab() {
     }
 
     // 删除指定分类中的题目
-    const removeQuestion = (categoryIndex: number, questionIndex: number) => {
+    const removeQuestion = (categoryId: string, questionId: string) => {
         const updatedCategories = [...categories]
-        updatedCategories[categoryIndex].questions = updatedCategories[categoryIndex].questions.filter((_: QuestionType, i: number) => i !== questionIndex)
+        const categoryIndex = updatedCategories.findIndex(cat => cat.id === categoryId)
+        if (categoryIndex === -1) return
+        updatedCategories[categoryIndex].questions = updatedCategories[categoryIndex].questions.filter(q => q.id !== questionId)
         setValue("categories", updatedCategories)
     }
 
@@ -172,7 +208,7 @@ export default function ExamTab() {
                                             </CollapsibleTrigger>
                                             <Button
                                                 type="button"
-                                                onClick={() => openAddQuestionDialog(categoryIndex)}
+                                                onClick={() => openAddQuestionDialog(category.id)}
                                             >
                                                 添加题目
                                             </Button>
@@ -205,15 +241,15 @@ export default function ExamTab() {
                                                                                 type="button"
                                                                                 variant="secondary"
                                                                                 size="sm"
-                                                                                onClick={() => openEditQuestionDialog(categoryIndex, questionIndex)}
+                                                                                onClick={() => openEditQuestionDialog(category.id, question)}
                                                                             >
                                                                                 编辑题目
                                                                             </Button>
                                                                             <Button
                                                                                 type="button"
-                                                                                variant="secondary"
+                                                                                variant="danger"
                                                                                 size="sm"
-                                                                                onClick={() => removeQuestion(categoryIndex, questionIndex)}
+                                                                                onClick={() => removeQuestion(category.id, question.id)}
                                                                             >
                                                                                 删除题目
                                                                             </Button>
@@ -306,7 +342,7 @@ export default function ExamTab() {
                                 onOpenChange={setIsDialogOpen}
                                 onSave={saveQuestion}
                                 editingQuestion={editingQuestion}
-                                categoryName={categories[currentCategoryIndex]?.name}
+                                categoryName={categories.find(cat => cat.id === currentCategoryId)?.name}
                             />
 
                         </form>

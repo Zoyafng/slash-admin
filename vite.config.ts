@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
 		].filter(Boolean),
 
 		server: {
-			open: true,
+			open: false,
 			host: true,
 			port: 3001,
 			proxy: {

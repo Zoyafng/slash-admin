@@ -62,6 +62,7 @@ export default function QuestionCreateModal({
   editingQuestion = null,
   categoryName = ""
 }: QuestionCreateModalProps) {
+  console.log(editingQuestion, "editingQuestion")
   const [questionData, setQuestionData] = React.useState<Question>(
     editingQuestion || initQuestion
   )
@@ -170,6 +171,11 @@ export default function QuestionCreateModal({
   }
 
   useEffect(() => {
+    if (open) {
+      setQuestionData(
+        editingQuestion || initQuestion
+      )
+    }
     return () => {
       setQuestionData(
         initQuestion
@@ -280,7 +286,7 @@ export default function QuestionCreateModal({
                       </FormItem>
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="danger"
                         size="sm"
                         onClick={() => removeOption(optionIndex)}
                       >
@@ -336,13 +342,15 @@ export default function QuestionCreateModal({
 
                   </div>
                 ))}
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={addOption}
-                >
-                  添加选项
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="bg-info! text-white!"
+                    onClick={addOption}
+                  >
+                    添加选项
+                  </Button></div>
               </div>
             )}
 
