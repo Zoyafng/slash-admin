@@ -5,6 +5,7 @@ import { Button } from "@/ui/button"
 import { Input } from "@/ui/input"
 import { Textarea } from "@/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
+import { useEffect } from "react"
 
 // 题目类型
 export enum QuestionType {
@@ -42,6 +43,18 @@ export interface QuestionCreateModalProps {
   categoryName?: string
 }
 
+const initQuestion = {
+  id: crypto.randomUUID(),
+  type: QuestionType.SINGLE_CHOICE,
+  content: "",
+  options: [
+    { id: crypto.randomUUID(), content: "", isCorrect: false },
+    { id: crypto.randomUUID(), content: "", isCorrect: false }
+  ],
+  score: 5,
+  answerAnalysis: ""
+}
+
 export default function QuestionCreateModal({
   open,
   onOpenChange,
@@ -50,17 +63,7 @@ export default function QuestionCreateModal({
   categoryName = ""
 }: QuestionCreateModalProps) {
   const [questionData, setQuestionData] = React.useState<Question>(
-    editingQuestion || {
-      id: crypto.randomUUID(),
-      type: QuestionType.SINGLE_CHOICE,
-      content: "",
-      options: [
-        { id: crypto.randomUUID(), content: "", isCorrect: false },
-        { id: crypto.randomUUID(), content: "", isCorrect: false }
-      ],
-      score: 5,
-      answerAnalysis: ""
-    }
+    editingQuestion || initQuestion
   )
 
   // 处理题目类型变化
@@ -165,6 +168,14 @@ export default function QuestionCreateModal({
       score
     }))
   }
+
+  useEffect(() => {
+    return () => {
+      setQuestionData(
+        initQuestion
+      )
+    }
+  }, [open])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
