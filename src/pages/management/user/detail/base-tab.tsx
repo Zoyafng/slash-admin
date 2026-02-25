@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/ui/card";
 import { BasicStatus } from "#/enum";
 
 
-export default function PaperBaseTab() {
+export default function UserBaseTab() {
     const userId = useParams().userId;
     // TODO: 从API获取paper详情数据
     const paper = {

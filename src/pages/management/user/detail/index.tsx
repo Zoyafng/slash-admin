@@ -6,9 +6,9 @@ import { Avatar, AvatarImage } from "@/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 import { Text, Title } from "@/ui/typography";
 import type { CSSProperties } from "react";
-import TeamsTab from "./teams-tab";
 import BaseTab from "./base-tab";
 import { useParams } from "@/routes/hooks";
+import RecordTab from "./record-tab";
 
 
 function UserProfile() {
@@ -35,7 +35,7 @@ function UserProfile() {
 		{
 			icon: <Icon icon="solar:calendar-bold" size={24} className="mr-2" />,
 			title: "答题记录",
-			content: <TeamsTab />,
+			content: <RecordTab />,
 		},
 	];
 	// TODO: 从API获取user详情数据

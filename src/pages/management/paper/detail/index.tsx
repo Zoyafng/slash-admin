@@ -33,7 +33,7 @@ const tabs = [
 ];
 
 export default function PaperDetailPage() {
-	const { paperId } = useParams<{ paperId: string }>();
+	const paperId = useParams().paperId;
 	const { push } = useRouter();
 
 	// TODO: 从API获取paper详情数据

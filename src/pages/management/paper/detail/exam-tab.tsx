@@ -7,14 +7,9 @@ import QuestionCreateModal, { Question as QuestionType, QuestionType as Question
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/ui/collapsible";
 import { cn } from "@/utils"
 import { Icon } from "@/components/icon"
+import { QuestionCategory } from "@/types/enum"
 
-// 题型分类
-enum QuestionCategory {
-    GENERAL_KNOWLEDGE = "general_knowledge",
-    QUANTITATIVE_REASONING = "quantitative_reasoning",
-    VERBAL_ABILITY = "verbal_ability",
-    LOGICAL_REASONING = "logical_reasoning"
-}
+
 
 // 题型分类数据结构
 interface QuestionCategoryData {

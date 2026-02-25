@@ -62,3 +62,13 @@ export enum HtmlDataAttribute {
 	ColorPalette = "data-color-palette",
 	ThemeMode = "data-theme-mode",
 }
+
+
+
+// 题型分类
+export enum QuestionCategory {
+    GENERAL_KNOWLEDGE = "general_knowledge",
+    QUANTITATIVE_REASONING = "quantitative_reasoning",
+    VERBAL_ABILITY = "verbal_ability",
+    LOGICAL_REASONING = "logical_reasoning"
+}

@@ -1,6 +1,5 @@
 import { Icon } from "@/components/icon";
 import { usePathname, useRouter } from "@/routes/hooks";
-import { Badge } from "@/ui/badge";
 import { Button } from "@/ui/button";
 import { Card, CardContent, CardHeader } from "@/ui/card";
 import { Table } from "antd";
