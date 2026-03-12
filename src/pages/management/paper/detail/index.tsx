@@ -5,6 +5,7 @@ import { BasicStatus } from "#/enum";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 import PaperBaseTab from "./base-tab";
 import ExamTab from "./exam-tab";
+import RecordTab from "./record-tab";
 
 const tabs = [
 	{
@@ -23,13 +24,9 @@ const tabs = [
 		icon: <Icon icon="solar:calendar-bold" size={24} className="mr-2" />,
 		key: "record",
 		title: "答题记录",
-		content: <div>Projects Tab</div>,
+		content: <RecordTab />,
 	},
-	// {
-	// 	icon: <Icon icon="mingcute:profile-fill" size={24} className="mr-2" />,
-	// 	title: "Connections",
-	// 	content: <div>Connections Tab</div>,
-	// },
+
 ];
 
 export default function PaperDetailPage() {

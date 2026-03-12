@@ -2113,7 +2113,7 @@ export function WrongQuestionsDialog({
           </div>
 
           {/* 题目渲染区 */}
-          <div className="flex-1 overflow-y-auto bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex-1 overflow-y-auto bg-white rounded-xl border border-gray-200 shadow-sm m-4 ml-0">
             {currentQuestion && <QuestionView question={currentQuestion} />}
           </div>
         </div>
