@@ -5,6 +5,8 @@ import { Button } from "@/ui/button"
 import { Input } from "@/ui/input"
 import { Textarea } from "@/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
+import { Icon } from "@/components/icon"
+import { cn } from "@/utils"
 import { useEffect } from "react"
 
 // 题目类型
@@ -34,7 +36,6 @@ export interface Question {
   answerAnalysisImageUrl?: string
 }
 
-// 组件 props 接口
 export interface QuestionCreateModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -43,7 +44,9 @@ export interface QuestionCreateModalProps {
   categoryName?: string
 }
 
-const initQuestion = {
+const OPTION_LABELS = ["A", "B", "C", "D", "E", "F"]
+
+const initQuestion: Question = {
   id: crypto.randomUUID(),
   type: QuestionType.SINGLE_CHOICE,
   content: "",
@@ -62,34 +65,31 @@ export default function QuestionCreateModal({
   editingQuestion = null,
   categoryName = ""
 }: QuestionCreateModalProps) {
-  console.log(editingQuestion, "editingQuestion")
   const [questionData, setQuestionData] = React.useState<Question>(
     editingQuestion || initQuestion
   )
 
-  // 处理题目类型变化
   const handleTypeChange = (value: string) => {
     const newType = value as QuestionType
     setQuestionData(prev => ({
       ...prev,
       type: newType,
-      options: (newType === QuestionType.SINGLE_CHOICE || newType === QuestionType.MULTIPLE_CHOICE) ?
-        (prev.options || [{ id: crypto.randomUUID(), content: "", isCorrect: false }, { id: crypto.randomUUID(), content: "", isCorrect: false }]) :
-        undefined
+      options: (newType === QuestionType.SINGLE_CHOICE || newType === QuestionType.MULTIPLE_CHOICE)
+        ? (prev.options || [
+          { id: crypto.randomUUID(), content: "", isCorrect: false },
+          { id: crypto.randomUUID(), content: "", isCorrect: false }
+        ])
+        : undefined
     }))
   }
 
-  // 处理选项内容变化
   const handleOptionChange = (optionIndex: number, content: string) => {
     setQuestionData(prev => ({
       ...prev,
-      options: prev.options?.map((opt, idx) =>
-        idx === optionIndex ? { ...opt, content } : opt
-      )
+      options: prev.options?.map((opt, idx) => idx === optionIndex ? { ...opt, content } : opt)
     }))
   }
 
-  // 处理选项图片上传
   const handleOptionImageUpload = (optionIndex: number) => {
     setQuestionData(prev => ({
       ...prev,
@@ -99,40 +99,26 @@ export default function QuestionCreateModal({
     }))
   }
 
-  // 处理正确选项变化
   const handleOptionCorrectnessChange = (optionIndex: number, isCorrect: boolean) => {
     setQuestionData(prev => ({
       ...prev,
       options: prev.options?.map((opt, idx) => {
         if (prev.type === QuestionType.SINGLE_CHOICE) {
-          // 单选题：只有当前选项为正确
-          return {
-            ...opt,
-            isCorrect: idx === optionIndex
-          }
+          return { ...opt, isCorrect: idx === optionIndex }
         } else {
-          // 多选题：根据传入的 isCorrect 值设置
-          return {
-            ...opt,
-            isCorrect: idx === optionIndex ? isCorrect : opt.isCorrect
-          }
+          return { ...opt, isCorrect: idx === optionIndex ? isCorrect : opt.isCorrect }
         }
       })
     }))
   }
 
-  // 添加选项
   const addOption = () => {
     setQuestionData(prev => ({
       ...prev,
-      options: [
-        ...(prev.options || []),
-        { id: crypto.randomUUID(), content: "", isCorrect: false }
-      ]
+      options: [...(prev.options || []), { id: crypto.randomUUID(), content: "", isCorrect: false }]
     }))
   }
 
-  // 删除选项
   const removeOption = (optionIndex: number) => {
     setQuestionData(prev => ({
       ...prev,
@@ -140,21 +126,15 @@ export default function QuestionCreateModal({
     }))
   }
 
-  // 处理保存
   const handleSave = () => {
     onSave(questionData)
     onOpenChange(false)
   }
 
-  // 处理题目内容变化
   const handleContentChange = (content: string) => {
-    setQuestionData(prev => ({
-      ...prev,
-      content
-    }))
+    setQuestionData(prev => ({ ...prev, content }))
   }
 
-  // 处理题目图片上传
   const handleImageUpload = () => {
     setQuestionData(prev => ({
       ...prev,
@@ -162,256 +142,247 @@ export default function QuestionCreateModal({
     }))
   }
 
-  // 处理分值变化
   const handleScoreChange = (score: number) => {
-    setQuestionData(prev => ({
-      ...prev,
-      score
-    }))
+    setQuestionData(prev => ({ ...prev, score }))
   }
 
   useEffect(() => {
     if (open) {
-      setQuestionData(
-        editingQuestion || initQuestion
-      )
+      setQuestionData(editingQuestion || initQuestion)
     }
-    return () => {
-      setQuestionData(
-        initQuestion
-      )
-    }
+    return () => { setQuestionData(initQuestion) }
   }, [open])
+
+  const isChoiceType =
+    questionData.type === QuestionType.SINGLE_CHOICE ||
+    questionData.type === QuestionType.MULTIPLE_CHOICE
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-6xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{editingQuestion ? "编辑题目" : "添加题目"}</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <p className="text-sm text-muted-foreground">
-            在 {categoryName} 分类中{editingQuestion ? "编辑" : "添加"}题目
-          </p>
+      <DialogContent className="sm:max-w-3xl max-h-[88vh] overflow-hidden flex flex-col p-0">
 
-          {/* 题目创建/编辑表单 */}
-          <div className="space-y-6">
-            {/* 题目类型选择 */}
-            <FormItem>
-              <FormLabel>题目类型</FormLabel>
-              <FormControl>
-                <Select
-                  value={questionData.type}
-                  onValueChange={handleTypeChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择题目类型" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={QuestionType.SINGLE_CHOICE}>
-                      单选题
-                    </SelectItem>
-                    <SelectItem value={QuestionType.MULTIPLE_CHOICE}>
-                      多选题
-                    </SelectItem>
-                    <SelectItem value={QuestionType.SHORT_ANSWER}>
-                      简答题
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-            </FormItem>
+        {/* ── Header ── */}
+        <DialogHeader className="px-6 pt-5 pb-4 border-b shrink-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle className="text-base font-semibold">
+                {editingQuestion ? "编辑题目" : "添加题目"}
+              </DialogTitle>
+              {categoryName && (
+                <p className="text-xs text-muted-foreground mt-0.5">分类：{categoryName}</p>
+              )}
+            </div>
 
-            {/* 题目内容 */}
-            <FormItem>
-              <FormLabel>题目内容</FormLabel>
-              <div className="space-y-2">
-                <FormControl>
-                  <Textarea
-                    placeholder="请输入题目内容"
-                    value={questionData.content}
-                    onChange={(e) => handleContentChange(e.target.value)}
-                    className="min-h-[100px]"
-                  />
-                </FormControl>
-                {questionData.imageUrl && (
-                  <div className="mt-2 p-2 border rounded">
-                    <img
-                      src={questionData.imageUrl}
-                      alt="题目图片"
-                      className="max-h-40 object-contain"
-                    />
-                  </div>
-                )}
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleImageUpload}
-                >
-                  上传题目图片
-                </Button>
+            {/* 题型选择 + 分值 —— 收在 header 右侧，轻量呈现 */}
+            <div className="flex items-center gap-2 mr-6">
+              <Select value={questionData.type} onValueChange={handleTypeChange}>
+                <SelectTrigger className="h-8 text-xs w-28 border-dashed">
+                  <SelectValue placeholder="题目类型" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={QuestionType.SINGLE_CHOICE}>单选题</SelectItem>
+                  <SelectItem value={QuestionType.MULTIPLE_CHOICE}>多选题</SelectItem>
+                  <SelectItem value={QuestionType.SHORT_ANSWER}>简答题</SelectItem>
+                </SelectContent>
+              </Select>
 
-              </div>
-            </FormItem>
-
-            {/* 题目分值 */}
-            <FormItem>
-              <FormLabel>分值</FormLabel>
-              <FormControl>
+              <div className="flex items-center gap-1 h-8 px-2.5 rounded-md border border-dashed text-xs text-muted-foreground">
+                <Icon icon="solar:star-bold" size={12} className="text-amber-400 shrink-0" />
                 <Input
                   type="number"
                   min="0"
                   step="1"
-                  value={questionData.score || 5}
+                  value={questionData.score ?? 5}
                   onChange={(e) => handleScoreChange(parseFloat(e.target.value) || 0)}
+                  className="border-0 p-0 h-auto w-9 text-xs focus-visible:ring-0 text-center"
                 />
-              </FormControl>
-            </FormItem>
+                <span>分</span>
+              </div>
+            </div>
+          </div>
+        </DialogHeader>
 
+        {/* ── 滚动内容区 ── */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
 
-
-            {/* 选项（单选题和多选题） */}
-            {(questionData.type === QuestionType.SINGLE_CHOICE || questionData.type === QuestionType.MULTIPLE_CHOICE) && (
-              <div className="space-y-4">
-                <h4 className="font-medium">选项</h4>
-                {(questionData.options || []).map((option, optionIndex) => (
-                  <div key={option.id} className="space-y-2 p-4 border rounded">
-                    <div className="flex justify-between items-center">
-                      <FormItem>
-                        <FormLabel>
-                          选项 {String.fromCharCode(65 + optionIndex)}
-                          {(option.isCorrect) && " (正确选项)"}
-                        </FormLabel>
-                      </FormItem>
-                      <Button
-                        type="button"
-                        variant="danger"
-                        size="sm"
-                        onClick={() => removeOption(optionIndex)}
-                      >
-                        删除选项
-                      </Button>
-                    </div>
-                    <FormControl>
-                      <Input
-                        placeholder="请输入选项内容"
-                        value={option.content}
-                        onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
-                      />
-                    </FormControl>
-                    {option.imageUrl && (
-                      <div className="mt-2 p-2 border rounded">
-                        <img
-                          src={option.imageUrl}
-                          alt={`选项 ${String.fromCharCode(65 + optionIndex)} 图片`}
-                          className="max-h-32 object-contain"
-                        />
-                      </div>
-                    )}
-                    <div className="flex space-x-2">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => handleOptionImageUpload(optionIndex)}
-                      >
-                        上传选项图片
-                      </Button>
-                      {questionData.type === QuestionType.SINGLE_CHOICE && (
-                        <FormItem className="flex items-center space-x-2">
-                          <input
-                            type="radio"
-                            checked={option.isCorrect || false}
-                            onChange={() => handleOptionCorrectnessChange(optionIndex, true)}
-                          />
-                          <FormLabel className="mb-0" onClick={() => handleOptionCorrectnessChange(optionIndex, true)}>正确选项</FormLabel>
-                        </FormItem>
-                      )}
-                      {questionData.type === QuestionType.MULTIPLE_CHOICE && (
-                        <FormItem className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            checked={option.isCorrect || false}
-                            onChange={(e) => handleOptionCorrectnessChange(optionIndex, e.target.checked)}
-                          />
-                          <FormLabel className="mb-0" onClick={() => handleOptionCorrectnessChange(optionIndex, !option.isCorrect)}>正确选项</FormLabel>
-                        </FormItem>
-                      )}
-                    </div>
-
-                  </div>
-                ))}
-                <div className="flex justify-center">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="bg-info! text-white!"
-                    onClick={addOption}
-                  >
-                    添加选项
-                  </Button></div>
+          {/* 题目内容 */}
+          <div className="space-y-2">
+            <FormLabel className="text-sm font-medium">
+              题目内容
+              <span className="text-destructive ml-0.5">*</span>
+            </FormLabel>
+            <Textarea
+              placeholder="请输入题目内容…"
+              value={questionData.content}
+              onChange={(e) => handleContentChange(e.target.value)}
+              className="min-h-[96px] resize-none text-sm"
+            />
+            {questionData.imageUrl && (
+              <div className="rounded-md border overflow-hidden w-fit">
+                <img src={questionData.imageUrl} alt="题目图片" className="max-h-36 object-contain" />
               </div>
             )}
-
-            {/* 答案解析 */}
-            <FormItem>
-              <FormLabel>答案解析</FormLabel>
-              <div className="space-y-2">
-                <FormControl>
-                  <Textarea
-                    placeholder="请输入答案解析"
-                    value={questionData.answerAnalysis || ""}
-                    onChange={(e) => setQuestionData(prev => ({
-                      ...prev,
-                      answerAnalysis: e.target.value
-                    }))}
-                    className="min-h-[100px]"
-                  />
-                </FormControl>
-                {questionData.answerAnalysisImageUrl && (
-                  <div className="mt-2 p-2 border rounded">
-                    <img
-                      src={questionData.answerAnalysisImageUrl}
-                      alt="解析图片"
-                      className="max-h-40 object-contain"
-                    />
-                  </div>
-                )}
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setQuestionData(prev => ({
-                    ...prev,
-                    answerAnalysisImageUrl: `https://example.com/image-${crypto.randomUUID()}.jpg`
-                  }))}
-                >
-                  上传解析图片
-                </Button>
-
-              </div>
-            </FormItem>
+            <button
+              type="button"
+              onClick={handleImageUpload}
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Icon icon="solar:upload-linear" size={13} />
+              上传题目图片
+            </button>
           </div>
 
-          <div className="flex space-x-4 pt-4">
-            <Button
+          {/* 选项区 */}
+          {isChoiceType && (
+            <div className="space-y-3">
+              <FormLabel className="text-sm font-medium flex items-center gap-2">
+                选项
+                <span className="text-xs text-muted-foreground font-normal">
+                  {questionData.type === QuestionType.SINGLE_CHOICE
+                    ? "点击字母圆圈标记正确答案"
+                    : "点击字母圆圈勾选所有正确答案"}
+                </span>
+              </FormLabel>
+
+              <div className="space-y-2">
+                {(questionData.options || []).map((option, optionIndex) => (
+                  <div
+                    key={option.id}
+                    className={cn(
+                      "group flex items-start gap-3 px-3 py-2.5 rounded-lg border transition-colors",
+                      option.isCorrect
+                        ? "border-green-300 bg-green-50/70"
+                        : "border-border bg-muted/20 hover:bg-muted/40"
+                    )}
+                  >
+                    {/* 字母按钮，点击设置正确答案 */}
+                    <button
+                      type="button"
+                      title={option.isCorrect ? "取消正确答案" : "设为正确答案"}
+                      className={cn(
+                        "w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center shrink-0 mt-1.5 transition-colors",
+                        option.isCorrect
+                          ? "bg-green-500 text-white"
+                          : "bg-muted text-muted-foreground hover:bg-green-100 hover:text-green-600"
+                      )}
+                      onClick={() =>
+                        handleOptionCorrectnessChange(
+                          optionIndex,
+                          questionData.type === QuestionType.SINGLE_CHOICE ? true : !option.isCorrect
+                        )
+                      }
+                    >
+                      {option.isCorrect
+                        ? <Icon icon="mingcute:check-fill" size={11} />
+                        : OPTION_LABELS[optionIndex]
+                      }
+                    </button>
+
+                    {/* 输入区 */}
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      <Input
+                        placeholder={`选项 ${OPTION_LABELS[optionIndex]}…`}
+                        value={option.content}
+                        onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
+                        className="h-8 text-sm border-0 bg-transparent px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50"
+                      />
+                      {option.imageUrl && (
+                        <div className="rounded border overflow-hidden w-fit">
+                          <img
+                            src={option.imageUrl}
+                            alt={`选项 ${OPTION_LABELS[optionIndex]} 图片`}
+                            className="max-h-24 object-contain"
+                          />
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleOptionImageUpload(optionIndex)}
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <Icon icon="solar:upload-linear" size={11} />
+                        上传图片
+                      </button>
+                    </div>
+
+                    {/* 删除按钮，hover 才显示 */}
+                    <button
+                      type="button"
+                      onClick={() => removeOption(optionIndex)}
+                      className="h-6 w-6 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100 shrink-0 flex items-center justify-center"
+                    >
+                      <Icon icon="mingcute:close-fill" size={13} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* 添加选项 */}
+              <button
+                type="button"
+                onClick={addOption}
+                className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed text-sm text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+              >
+                <Icon icon="mingcute:add-fill" size={14} />
+                添加选项
+              </button>
+            </div>
+          )}
+
+          {/* 答案解析 */}
+          <div className="space-y-2">
+            <FormLabel className="text-sm font-medium text-muted-foreground">
+              答案解析
+              <span className="text-xs font-normal">（选填）</span>
+            </FormLabel>
+            <Textarea
+              placeholder="请输入答案解析…"
+              value={questionData.answerAnalysis || ""}
+              onChange={(e) =>
+                setQuestionData(prev => ({ ...prev, answerAnalysis: e.target.value }))
+              }
+              className="min-h-[80px] resize-none text-sm bg-amber-50/50 border-amber-100 focus-visible:ring-amber-200"
+            />
+            {questionData.answerAnalysisImageUrl && (
+              <div className="rounded-md border overflow-hidden w-fit">
+                <img src={questionData.answerAnalysisImageUrl} alt="解析图片" className="max-h-36 object-contain" />
+              </div>
+            )}
+            <button
               type="button"
-              className="flex-1"
-              onClick={handleSave}
+              onClick={() =>
+                setQuestionData(prev => ({
+                  ...prev,
+                  answerAnalysisImageUrl: `https://example.com/image-${crypto.randomUUID()}.jpg`
+                }))
+              }
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              保存题目
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              className="flex-1"
-              onClick={() => onOpenChange(false)}
-            >
-              取消
-            </Button>
+              <Icon icon="solar:upload-linear" size={13} />
+              上传解析图片
+            </button>
           </div>
         </div>
+
+        {/* ── 底部操作栏 ── */}
+        <div className="px-6 py-4 border-t bg-muted/20 flex items-center justify-end gap-2 shrink-0">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+          >
+            取消
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSave}
+          >
+            保存题目
+          </Button>
+        </div>
+
       </DialogContent>
     </Dialog>
   )
