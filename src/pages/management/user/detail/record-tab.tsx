@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Icon } from "@/components/icon";
 import { useParams } from "@/routes/hooks";
 import { Card, CardContent } from "@/ui/card";
@@ -7,24 +8,24 @@ import { cn } from "@/utils";
 import { Button } from "@/ui/button";
 import { Progress } from "@/ui/progress";
 import { QuestionCategory } from "@/types/enum";
+import { WrongQuestionsDialog } from "@/components/wrong-questions-dialog";
 
 
 
 export default function RecordTab() {
-    const userId = useParams().userId;
-    // TODO: 从API获取paper详情数据
-    const paper = {
-        id: userId,
-        isAuth: true,
-        paperName: "2026年春季信息工程类试卷",
-        name: "王艺淼",
-        major: "信息工程",
-        school: "中国科技大学",
-        phone: "13800000000",
-        createdAt: "2026-02-05",
-        updatedAt: "2026-02-05",
-        status: 0
+    useParams(); // 保留参数获取，以备后续使用
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+    const [selectedWrongQuestions, setSelectedWrongQuestions] = React.useState<any[]>([]);
+    const [currentCategory, setCurrentCategory] = React.useState<string>("");
+
+    // 处理查看错题按钮点击
+    const handleViewWrongQuestions = (wrongQuestions: any[], category: string) => {
+        setSelectedWrongQuestions(wrongQuestions);
+        setCurrentCategory(category);
+        setDialogOpen(true); // 打开对话框
     };
+
+    // TODO: 从API获取paper详情数据
 
     const columns: ColumnsType<any> = [
         {
@@ -149,10 +150,18 @@ export default function RecordTab() {
             title: "错题记录",
             dataIndex: "wrongQuestions",
             width: 200,
-            render: (text: any) => {
-                return <Button variant="link" style={{
-                    textDecoration: "none"
-                }}>查看错题</Button>
+            render: (text: any, record: any) => {
+                return (
+                    <Button
+                        variant="link"
+                        style={{
+                            textDecoration: "none"
+                        }}
+                        onClick={() => handleViewWrongQuestions(text, record.category)}
+                    >
+                        查看错题
+                    </Button>
+                );
             },
         },
     ];
@@ -236,38 +245,48 @@ export default function RecordTab() {
 
 
     return (
-        <Card className="border-null">
-            <CardContent>
-                <Table
-                    rowKey="id"
-                    size="small"
-                    scroll={{ x: "max-content" }}
-                    pagination={false}
-                    columns={columns}
-                    dataSource={mockData}
-                    expandable={{
-                        expandIcon: ({ expanded, onExpand, record }) => {
-                            return <div onClick={(e) => onExpand(record, e)}>
-                                <Icon icon="local:ic-right-arrow" size="16" className={cn({
-                                    "rotate-90": expanded,
-                                    "transition-transform": "0.3s",
-                                    "transform-origin": "center",
-                                    cursor: "pointer",
-                                })} />
-                            </div>
-                        },
-                        expandedRowRender: (record: any) => (
-                            <Table
-                                size="small"
-                                columns={subColumns}
-                                dataSource={record.subData}
-                                pagination={false}
-                                rowKey="id"
-                            />
-                        ),
-                    }}
-                />
-            </CardContent>
-        </Card>
+        <>
+            <Card className="border-null">
+                <CardContent>
+                    <Table
+                        rowKey="id"
+                        size="small"
+                        scroll={{ x: "max-content" }}
+                        pagination={false}
+                        columns={columns}
+                        dataSource={mockData}
+                        expandable={{
+                            expandIcon: ({ expanded, onExpand, record }) => {
+                                return <div onClick={(e) => onExpand(record, e)}>
+                                    <Icon icon="local:ic-right-arrow" size="16" className={cn({
+                                        "rotate-90": expanded,
+                                        "transition-transform": "0.3s",
+                                        "transform-origin": "center",
+                                        cursor: "pointer",
+                                    })} />
+                                </div>
+                            },
+                            expandedRowRender: (record: any) => (
+                                <Table
+                                    size="small"
+                                    columns={subColumns}
+                                    dataSource={record.subData}
+                                    pagination={false}
+                                    rowKey="id"
+                                />
+                            ),
+                        }}
+                    />
+                </CardContent>
+            </Card>
+
+            {/* 错题查看对话框 */}
+            <WrongQuestionsDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                wrongQuestions={selectedWrongQuestions}
+                category={currentCategory}
+            />
+        </>
     );
 }

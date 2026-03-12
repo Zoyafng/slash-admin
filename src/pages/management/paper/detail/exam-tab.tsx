@@ -200,6 +200,7 @@ export default function ExamTab() {
                                                         className={cn(
                                                             "text-lg font-medium transition-all duration-300 ease-in-out text-text-disabled",
                                                             "hover:text-text-primary",
+                                                            { "text-text-primary": isOpen }
                                                         )}
                                                     >
                                                         {category.name}
@@ -215,7 +216,7 @@ export default function ExamTab() {
 
                                         </div>
                                         <CollapsibleContent>
-                                            <div key={category.id} className="space-y-4">
+                                            <div key={category.id} className="space-y-4 mt-4">
                                                 {/* 题目列表 */}
                                                 <div className="space-y-6">
                                                     {
