@@ -70,5 +70,6 @@ export enum QuestionCategory {
     GENERAL_KNOWLEDGE = "general_knowledge",
     QUANTITATIVE_REASONING = "quantitative_reasoning",
     VERBAL_ABILITY = "verbal_ability",
-    LOGICAL_REASONING = "logical_reasoning"
+	LOGICAL_REASONING = "logical_reasoning",
+	DATA_ANALYSIS = "data_analysis",
 }

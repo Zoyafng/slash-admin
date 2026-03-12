@@ -272,7 +272,7 @@ export default function ExamTab() {
                                                                         <div
                                                                             key={option.id}
                                                                             className={cn(
-                                                                                "flex items-start gap-3 px-3 py-2.5 rounded-md text-sm transition-colors",
+                                                                                "flex items-start justify-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors",
                                                                                 option.isCorrect
                                                                                     ? "bg-green-50 border border-green-200 text-green-900"
                                                                                     : "bg-muted/30 border border-transparent"
