@@ -2104,7 +2104,7 @@ export function WrongQuestionsDialog({
 
         <div className="flex flex-1 overflow-hidden bg-gray-50">
           {/* 题目选择区 */}
-          <div className=" shrink-0 bg-gray-50 border-r border-gray-200 overflow-y-auto">
+          <div className=" shrink-0 bg-gray-50  overflow-y-auto">
             <QuestionSelector
               groups={groups}
               currentId={currentId}

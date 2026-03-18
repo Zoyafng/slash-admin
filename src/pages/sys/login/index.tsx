@@ -1,6 +1,6 @@
 import PlaceholderImg from "@/assets/images/background/placeholder.svg";
+import AppNameLogo from "@/components/app-name-logo";
 import LocalePicker from "@/components/locale-picker";
-import Logo from "@/components/logo";
 import { GLOBAL_CONFIG } from "@/global-config";
 import SettingButton from "@/layouts/components/setting-button";
 import { useUserToken } from "@/store/userStore";
@@ -24,8 +24,7 @@ function LoginPage() {
 			<div className="flex flex-col gap-4 p-6 md:p-10">
 				<div className="flex justify-center gap-2 md:justify-start">
 					<div className="flex items-center gap-2 font-medium cursor-pointer">
-						<Logo size={28} />
-						<span>{GLOBAL_CONFIG.appName}</span>
+						<AppNameLogo imgClassName="h-12" />
 					</div>
 				</div>
 				<div className="flex flex-1 items-center justify-center">
